@@ -41,9 +41,10 @@ public class WaterResource {
         return waterService.findByDate(date);
     }
 
-    @PutMapping("delete/{id}")
-    public WaterConsumptionResponse deleteWaterConsumption(@PathVariable long id){
-        return waterService.deleteWaterConsumption(id);
+    @ApiOperation(value = "Delete existed waterConsumption")
+    @PostMapping("/deleteWaterConsumption")
+    public WaterConsumptionResponse deleteWaterConsumption(@RequestBody WaterConsumptionRequest waterConsumptionRequest){
+        return waterService.deleteWaterConsumption(waterConsumptionRequest);
     }
 
     @ApiOperation(value = "Create new waterConsumption")

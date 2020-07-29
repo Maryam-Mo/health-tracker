@@ -39,6 +39,7 @@ public class WaterServiceTest extends HealthTrackerServerApplicationTests {
         final WaterResponse updatedWater = waterService.update(modelMapper.map(savedWater, WaterRequest.class));
 
         assertNotNull(updatedWater);
+        assertEquals(savedWater.getId(), updatedWater.getId());
         assertEquals(savedWater.getDate(), updatedWater.getDate());
         assertEquals(savedWater.getMinConsumption(), updatedWater.getMinConsumption(), 0);
     }
@@ -50,6 +51,22 @@ public class WaterServiceTest extends HealthTrackerServerApplicationTests {
         assertNotNull(waterConsumptionResponse);
         assertEquals(2, waterConsumptionResponse.getMinConsumption(), 0);
         assertEquals(waterConsumptionResponse.getWaterConsumptions().size(), 1);
+        assertEquals(getWaterConsumption().getTime(), waterConsumptionResponse.getWaterConsumptions().get(0).getTime());
+        assertEquals(getWaterConsumption().getConsumption(), waterConsumptionResponse.getWaterConsumptions().get(0).getConsumption(), 0);
+    }
+
+    @Test
+    public void updateWaterConsumption() {
+        final WaterConsumptionResponse createdWaterConsumptionResponse = waterService.createWaterConsumption(getWaterConsumption());
+        final WaterConsumptionRequest waterConsumptionRequest = new WaterConsumptionRequest(createdWaterConsumptionResponse.getWaterConsumptions().get(0).getId(), createdWaterConsumptionResponse.getWaterId(), "8 Am", 0.6);
+        final WaterConsumptionResponse updatedWaterConsumptionResponse = waterService.updateWaterConsumption(waterConsumptionRequest);
+
+        assertNotNull(updatedWaterConsumptionResponse);
+        assertEquals(2, updatedWaterConsumptionResponse.getMinConsumption(), 0);
+        assertEquals(waterConsumptionRequest.getWaterId(), updatedWaterConsumptionResponse.getWaterId(), 0);
+        assertEquals(1, updatedWaterConsumptionResponse.getWaterConsumptions().size());
+        assertEquals(waterConsumptionRequest.getTime(), updatedWaterConsumptionResponse.getWaterConsumptions().get(0).getTime());
+        assertEquals(waterConsumptionRequest.getConsumption(), updatedWaterConsumptionResponse.getWaterConsumptions().get(0).getConsumption(), 0);
     }
 
     @Test
@@ -61,6 +78,17 @@ public class WaterServiceTest extends HealthTrackerServerApplicationTests {
         assertNotNull(waterConsumptionResponse);
         assertEquals(2, waterConsumptionResponse.getMinConsumption(), 0);
         assertEquals(waterConsumptionResponse.getWaterConsumptions().size(), 1);
+    }
+
+    @Test
+    public void deleteWaterConsumption() {
+        final WaterConsumptionResponse createdWaterConsumptionResponse = waterService.createWaterConsumption(getWaterConsumption());
+        final WaterConsumptionRequest waterConsumptionRequest = new WaterConsumptionRequest(createdWaterConsumptionResponse.getWaterConsumptions().get(0).getId(), createdWaterConsumptionResponse.getWaterId());
+        final WaterConsumptionResponse waterConsumptionResponse = waterService.deleteWaterConsumption(waterConsumptionRequest);
+
+        assertNotNull(waterConsumptionResponse);
+        assertEquals(2, waterConsumptionResponse.getMinConsumption(), 0);
+        assertEquals(waterConsumptionResponse.getWaterConsumptions().size(), 0);
     }
 
     private WaterRequest getWater() {

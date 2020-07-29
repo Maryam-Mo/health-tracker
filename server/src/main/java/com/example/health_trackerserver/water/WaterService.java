@@ -13,7 +13,7 @@ public interface WaterService {
     WaterResponse create(WaterRequest waterRequest);
     WaterResponse update(WaterRequest waterRequest);
     WaterConsumptionResponse findByDate(String date);
-    WaterConsumptionResponse deleteWaterConsumption(long id);
+    WaterConsumptionResponse deleteWaterConsumption(WaterConsumptionRequest waterConsumptionRequest);
     WaterConsumptionResponse createWaterConsumption(WaterConsumptionRequest waterConsumptionRequest);
     WaterConsumptionResponse updateWaterConsumption(WaterConsumptionRequest waterConsumptionRequest);
 }

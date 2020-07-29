@@ -20,4 +20,9 @@ public class WaterConsumptionRequest {
         this.time = time;
         this.consumption = consumption;
     }
+
+    public WaterConsumptionRequest(final long waterConsumptionId, final long waterId) {
+        this.waterConsumptionId = waterConsumptionId;
+        this.waterId = waterId;
+    }
 }
