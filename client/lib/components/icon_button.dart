@@ -13,7 +13,7 @@ class WhiteIconButton extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 16.0),
       child: Material(
         child: FlatButton.icon(
-          onPressed: () {},
+          onPressed: onPressed,
           icon: Container(
             child: icon,
             height: 40,

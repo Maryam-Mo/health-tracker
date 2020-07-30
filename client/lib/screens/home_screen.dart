@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:health/components/icon_button.dart';
+import 'package:health/components/purple_container.dart';
 import 'package:health/constants.dart';
+import 'package:health/screens/water_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String id = 'home_screen';
@@ -51,31 +53,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               Positioned(
                 bottom: 0,
-                child: Container(
+                child: PurpleContainerWithShadows(
                   width: 300,
                   height: 400,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(30),
-                    ),
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFF6757AA),
-                        const Color(0xFF39297E),
-                      ],
-                      begin: Alignment.center,
-                      end: Alignment.bottomCenter,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0xFFB9B8CC),
-                        offset: const Offset(-20.0, 30.0),
-                        blurRadius: 15.0,
-                        spreadRadius: 10.0,
-                      ),
-                    ],
-                  ),
-                  child: Column(
+                  begin: Alignment.center,
+                  end: Alignment.bottomCenter,
+                  column: Column(
                     children: <Widget>[
                       SizedBox(
                         height: 120,
@@ -184,7 +167,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   WhiteIconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, WaterScreen.id);
+                    },
                     text: '',
                     icon: Image(
                       image: AssetImage(
