@@ -21,3 +21,5 @@ const kTextTextStyle = TextStyle(
 );
 
 const kBackgroundColor = Color(0xFFF2F5FE);
+const kDarkPurpleColor = Color(0xFF39297E);
+const kLightPurpleColor = Color(0xFF6757AA);

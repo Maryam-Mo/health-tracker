@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:health/constants.dart';
 
 class PurpleContainerWithShadows extends StatelessWidget {
   PurpleContainerWithShadows(
@@ -21,8 +22,8 @@ class PurpleContainerWithShadows extends StatelessWidget {
         ),
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF6757AA),
-            const Color(0xFF39297E),
+            kLightPurpleColor,
+            kDarkPurpleColor,
           ],
           begin: begin,
           end: end,

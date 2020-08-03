@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:health/components/date_picker.dart';
 import 'package:health/components/icon_button.dart';
 import 'package:health/components/purple_container.dart';
 import 'package:health/constants.dart';
 
-class WaterScreen extends StatelessWidget {
+class WaterScreen extends StatefulWidget {
   static const String id = 'water_screen';
 
+  @override
+  _WaterScreenState createState() => _WaterScreenState();
+}
+
+class _WaterScreenState extends State<WaterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,6 +85,7 @@ class WaterScreen extends StatelessWidget {
               ],
             ),
           ),
+          DatePickerRow(),
           Expanded(
             flex: 1,
             child: Align(
