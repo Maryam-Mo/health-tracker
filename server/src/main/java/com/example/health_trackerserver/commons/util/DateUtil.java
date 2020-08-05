@@ -13,7 +13,7 @@ public enum  DateUtil {
     private DateUtil(){}
 
     public Long convertToMillis(String date) {
-        SimpleDateFormat f = new SimpleDateFormat("dd-MMM-yyyy");
+        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
         try {
             Date d = f.parse(date);
             return d.getTime();
@@ -21,5 +21,11 @@ public enum  DateUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String convertMillisToDate(long millis) {
+        Date date = new Date(millis);
+        SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
+        return df2.format(date);
     }
 }

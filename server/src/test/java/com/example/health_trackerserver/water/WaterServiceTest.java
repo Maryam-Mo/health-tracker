@@ -72,7 +72,7 @@ public class WaterServiceTest extends HealthTrackerServerApplicationTests {
     @Test
     public void findByDate() {
         waterService.createWaterConsumption(getWaterConsumption());
-        String date = "12-December-2019";
+        String date = "2019-12-12";
         WaterConsumptionResponse waterConsumptionResponse = waterService.findByDate(date);
 
         assertNotNull(waterConsumptionResponse);
@@ -92,7 +92,7 @@ public class WaterServiceTest extends HealthTrackerServerApplicationTests {
     }
 
     private WaterRequest getWater() {
-        long date = DateUtil.INSTANCE.convertToMillis("12-December-2019");
+        long date = DateUtil.INSTANCE.convertToMillis("2019-12-12");
         return new WaterRequest(date, 2);
     }
 

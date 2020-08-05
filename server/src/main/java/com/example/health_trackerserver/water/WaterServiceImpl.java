@@ -12,7 +12,10 @@ import ma.glasnost.orika.MapperFacade;
 import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Maryam Moein <maryam.moein@hotmail.com>
@@ -32,9 +35,13 @@ public class WaterServiceImpl implements WaterService {
 
     @Override
     public WaterResponse create(WaterRequest waterRequest) {
-        final Water water = modelMapper.map(waterRequest, Water.class);
-        final Water savedWater = waterRepository.save(water);
-        return modelMapper.map(savedWater, WaterResponse.class);
+        final Optional<Water> waterOptional = waterRepository.findByDate(waterRequest.getDate());
+        if (!waterOptional.isPresent()) {
+            final Water water = modelMapper.map(waterRequest, Water.class);
+            final Water savedWater = waterRepository.save(water);
+            return modelMapper.map(savedWater, WaterResponse.class);
+        }
+        return modelMapper.map(waterOptional.get(), WaterResponse.class);
     }
 
     @Override
@@ -49,17 +56,13 @@ public class WaterServiceImpl implements WaterService {
     @Override
     public WaterConsumptionResponse findByDate(String date) {
         final Water water = waterRepository.findByDate(DateUtil.INSTANCE.convertToMillis(date)).get();
-        final List<WaterConsumption> waterConsumptions = waterConsumptionRepository.findAllByWaterId(water.getId());
-        return new WaterConsumptionResponse(water.getId(), water.getMinConsumption(), waterConsumptions);
+        return mapAllWaterConsumptionsToWaterConsumptionResponse(water.getId());
     }
 
     @Override
     public WaterConsumptionResponse deleteWaterConsumption(WaterConsumptionRequest waterConsumptionRequest) {
-        final WaterConsumption waterConsumption = waterConsumptionRepository.findById(waterConsumptionRequest.getWaterConsumptionId()).orElseThrow(() -> new IllegalArgumentException("Invalid waterConsumption id"));
-        final Water water = waterRepository.findById(waterConsumptionRequest.getWaterId()).orElseThrow(() -> new IllegalArgumentException("Invalid water id"));
         waterConsumptionRepository.deleteById(waterConsumptionRequest.getWaterConsumptionId());
-        final List<WaterConsumption> waterConsumptions = waterConsumptionRepository.findAllByWaterId(waterConsumptionRequest.getWaterId());
-        return new WaterConsumptionResponse(waterConsumption.getId(), water.getMinConsumption(), waterConsumptions);
+        return mapAllWaterConsumptionsToWaterConsumptionResponse(waterConsumptionRequest.getWaterId());
     }
 
     @Override
@@ -67,7 +70,7 @@ public class WaterServiceImpl implements WaterService {
         final Water water = waterRepository.findById(waterConsumptionRequest.getWaterId()).orElseThrow(() -> new IllegalArgumentException("Invalid water id"));
         final WaterConsumption waterConsumption = waterConsumptionRepository.save(new WaterConsumption(waterConsumptionRequest.getTime(),
                 waterConsumptionRequest.getConsumption(), water));
-        return mapAllWaterConsumptionsToWaterConsumptionResponse(waterConsumption, waterConsumptionRequest.getWaterId());
+        return mapAllWaterConsumptionsToWaterConsumptionResponse(waterConsumptionRequest.getWaterId());
     }
 
     @Override
@@ -76,10 +79,10 @@ public class WaterServiceImpl implements WaterService {
         waterConsumption.setTime(waterConsumptionRequest.getTime());
         waterConsumption.setConsumption(waterConsumptionRequest.getConsumption());
         waterConsumptionRepository.save(waterConsumption);
-        return mapAllWaterConsumptionsToWaterConsumptionResponse(waterConsumption, waterConsumptionRequest.getWaterId());
+        return mapAllWaterConsumptionsToWaterConsumptionResponse(waterConsumptionRequest.getWaterId());
     }
 
-    private WaterConsumptionResponse mapAllWaterConsumptionsToWaterConsumptionResponse(final WaterConsumption waterConsumption, final long id) {
+    private WaterConsumptionResponse mapAllWaterConsumptionsToWaterConsumptionResponse(final long id) {
         final Water water = waterRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid water id"));
         final List<WaterConsumption> waterConsumptions = waterConsumptionRepository.findAllByWaterId(id);
         waterConsumptions.forEach(waterConsum -> waterConsum.setWater(water));
