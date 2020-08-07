@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
  */
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("api/water")
 public class WaterResource {
 
