@@ -3,6 +3,10 @@ import 'package:health/components/date_picker.dart';
 import 'package:health/components/icon_button.dart';
 import 'package:health/components/purple_container.dart';
 import 'package:health/constants.dart';
+import 'package:health/models/water_response.dart';
+import 'package:health/services/Networking.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class WaterScreen extends StatefulWidget {
   static const String id = 'water_screen';
@@ -12,6 +16,23 @@ class WaterScreen extends StatefulWidget {
 }
 
 class _WaterScreenState extends State<WaterScreen> {
+  static DateTime now = DateTime.now();
+  int dateTime =
+      new DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+
+  @override
+  void initState() {
+    super.initState();
+    createWater();
+  }
+
+  void createWater() async {
+    NetworkHelper networkHelper = NetworkHelper(url: '/api/water/create');
+    final WaterResponse waterResponse = await networkHelper
+        .postData(WaterResponse(id: 1, date: dateTime, minConsumption: 2));
+    print(waterResponse.date);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

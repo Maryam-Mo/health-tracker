@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 
 class DatePickerRow extends StatefulWidget {
   static DateTime dateTime = DateTime.now();
+//  static DateTime dateTime =
+//      new DateTime.fromMillisecondsSinceEpoch(1565001901000, isUtc: true);
 
   @override
   _DatePickerRowState createState() => _DatePickerRowState();
@@ -13,6 +15,7 @@ class DatePickerRow extends StatefulWidget {
 class _DatePickerRowState extends State<DatePickerRow> {
   String formattedDate =
       DateFormat('yyyy-MM-dd').format(DatePickerRow.dateTime);
+  //  String formattedDate = DateTime.now().millisecondsSinceEpoch.toString();
 
   @override
   Widget build(BuildContext context) {
