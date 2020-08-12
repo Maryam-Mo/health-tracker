@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:health/constants.dart';
+import 'package:health/screens/water_screen.dart';
 import 'package:intl/intl.dart';
 
 class DatePickerRow extends StatefulWidget {
@@ -39,6 +40,7 @@ class _DatePickerRowState extends State<DatePickerRow> {
                       doneStyle: TextStyle(color: Colors.white, fontSize: 16)),
                   onConfirm: (date) {
                 setState(() {
+                  WaterScreen().createState().createWater(date);
                   DatePickerRow.dateTime = date;
                   formattedDate =
                       DateFormat('yyyy-MM-dd').format(DatePickerRow.dateTime);
