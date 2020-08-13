@@ -10,11 +10,8 @@ import 'package:health/constants.dart';
 import 'package:health/models/water_consumption_request.dart';
 import 'package:health/models/water_consumption_response.dart';
 import 'package:health/models/water_response.dart';
-import 'package:health/services/Networking.dart';
 import 'package:health/services/water_consumption_service.dart';
 import 'package:health/services/water_service.dart';
-import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 
 class WaterScreen extends StatefulWidget {
   static const String id = 'water_screen';
@@ -24,16 +21,16 @@ class WaterScreen extends StatefulWidget {
 }
 
 class _WaterScreenState extends State<WaterScreen> {
-  List<Map<String, double>> _waterConsumption = [];
+  List<WaterConsumption> _waterConsumption = [];
   static DateTime dateTime = DateTime.now();
   WaterResponse waterResponse = null;
+  WaterConsumptionResponse waterConsumptionResponse = null;
 
   @override
   void initState() {
     super.initState();
     createWater(dateTime);
-    var map = {'12pm': 2.0};
-    _waterConsumption.add(map);
+    getWaterConsumptions(dateTime);
   }
 
   void createWater(dateTime) async {
@@ -42,7 +39,21 @@ class _WaterScreenState extends State<WaterScreen> {
     WaterService waterService = WaterService(url: '/api/water/create');
     waterResponse = await waterService
         .postData(WaterResponse(id: 1, date: date, minConsumption: 2));
-    print(waterResponse.date);
+  }
+
+  void getWaterConsumptions(dateTime) async {
+    int date = new DateTime(dateTime.year, dateTime.month, dateTime.day)
+        .millisecondsSinceEpoch;
+    WaterConsumptionService waterConsumptionService = WaterConsumptionService(
+        url: '/api/water/findAllConsumptionsByDate/${date}');
+    waterConsumptionResponse = await waterConsumptionService.fetchData();
+    print(waterConsumptionResponse.waterConsumptions);
+    if (waterConsumptionResponse != null) {
+      setState(() {
+        _waterConsumption = [];
+        _waterConsumption.addAll(waterConsumptionResponse.waterConsumptions);
+      });
+    }
   }
 
   @override
@@ -129,9 +140,14 @@ class _WaterScreenState extends State<WaterScreen> {
                     child: Row(
                       children: <Widget>[
                         Text(
-                            _waterConsumption[index].keys.first + ' consumed '),
-                        Text(_waterConsumption[index].values.first.toString() +
-                            'Liter'),
+                          _waterConsumption[index].time + ' consumed ',
+                          style: kListViewTextStyle,
+                        ),
+                        Text(
+                          _waterConsumption[index].consumption.toString() +
+                              ' Liter',
+                          style: kListViewTextStyle,
+                        ),
                       ],
                     ),
                   );
@@ -142,8 +158,9 @@ class _WaterScreenState extends State<WaterScreen> {
             child: Scaffold(
               backgroundColor: kBackgroundColor,
               floatingActionButton: new FloatingActionButton(
+                backgroundColor: kLightPurpleColor,
                 onPressed: () {
-                  _settingModalBottomSheet(context, dateTime);
+                  _settingModalBottomSheet(context, dateTime, waterResponse);
                 },
                 child: new Icon(Icons.add),
               ),
@@ -179,12 +196,12 @@ class _WaterScreenState extends State<WaterScreen> {
   }
 }
 
-void _settingModalBottomSheet(context, now) {
+void _settingModalBottomSheet(context, dateTime, waterResponse) {
   final myController = TextEditingController();
   final _amountValidator = RegExInputFormatter.withRegex(
       '^\$|^(0|([1-9][0-9]{0,}))(\\.[0-9]{0,})?\$');
 
-  Future<void> future = showModalBottomSheet(
+  showModalBottomSheet(
       context: context,
       builder: (BuildContext bc) {
         return Container(
@@ -235,14 +252,14 @@ void _settingModalBottomSheet(context, now) {
                     onPressed: () async {
                       WaterConsumptionRequest waterConsumption =
                           new WaterConsumptionRequest(
-                              waterConsumptionId: 1,
-                              waterId:
-                                  WaterScreen().createState().waterResponse.id,
+                              waterId: waterResponse.id,
                               time: TimePickerRow().createState().formattedTime,
                               consumption: double.parse(myController.text));
-                      WaterConsumptionResponse response =
-                          await createWaterConsumption(waterConsumption);
-                      Navigator.pop(context);
+                      await createWaterConsumption(waterConsumption);
+                      WaterScreen()
+                          .createState()
+                          .getWaterConsumptions(dateTime);
+                      Navigator.pushNamed(context, WaterScreen.id);
                     },
                     child: Text('Submit'),
                   ),
@@ -252,7 +269,6 @@ void _settingModalBottomSheet(context, now) {
           ),
         );
       });
-//  future.then((void value) => _closeModal(value));
 }
 
 Future<WaterConsumptionResponse> createWaterConsumption(
@@ -261,6 +277,6 @@ Future<WaterConsumptionResponse> createWaterConsumption(
       WaterConsumptionService(url: '/api/water/createWaterConsumption');
   WaterConsumptionResponse waterConsumptionResponse =
       await waterConsumptionService.postData(waterConsumption);
-  print(waterConsumptionResponse);
+  print(waterConsumptionResponse.waterConsumptions);
   return waterConsumptionResponse;
 }

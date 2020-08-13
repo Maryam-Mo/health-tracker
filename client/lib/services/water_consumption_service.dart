@@ -21,4 +21,15 @@ class WaterConsumptionService {
       return null;
     }
   }
+
+  Future<WaterConsumptionResponse> fetchData() async {
+    final response = await http.get(baseUrl + url);
+    if (response.statusCode == 200) {
+      final String responseString = response.body;
+      return waterConsumptionResponseFromJson(responseString);
+    } else {
+      print(response.statusCode);
+      return null;
+    }
+  }
 }

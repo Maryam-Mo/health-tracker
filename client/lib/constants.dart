@@ -20,6 +20,11 @@ const kTextTextStyle = TextStyle(
   fontStyle: FontStyle.italic,
 );
 
+const kListViewTextStyle = TextStyle(
+  color: Colors.black,
+  fontSize: 16.0,
+);
+
 const kBackgroundColor = Color(0xFFF2F5FE);
 const kDarkPurpleColor = Color(0xFF39297E);
 const kLightPurpleColor = Color(0xFF6757AA);
