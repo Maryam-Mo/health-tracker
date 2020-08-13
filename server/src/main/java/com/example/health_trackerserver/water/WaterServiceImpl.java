@@ -2,10 +2,7 @@ package com.example.health_trackerserver.water;
 
 import com.example.health_trackerserver.commons.exception.HealthTrackerException;
 import com.example.health_trackerserver.commons.util.DateUtil;
-import com.example.health_trackerserver.water.dto.WaterConsumptionRequest;
-import com.example.health_trackerserver.water.dto.WaterConsumptionResponse;
-import com.example.health_trackerserver.water.dto.WaterRequest;
-import com.example.health_trackerserver.water.dto.WaterResponse;
+import com.example.health_trackerserver.water.dto.*;
 import com.example.health_trackerserver.water.entity.Water;
 import com.example.health_trackerserver.water.entity.WaterConsumption;
 import ma.glasnost.orika.MapperFacade;
@@ -13,9 +10,7 @@ import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Maryam Moein <maryam.moein@hotmail.com>
@@ -54,38 +49,56 @@ public class WaterServiceImpl implements WaterService {
     }
 
     @Override
-    public WaterConsumptionResponse findByDate(String date) {
-        final Water water = waterRepository.findByDate(DateUtil.INSTANCE.convertToMillis(date)).get();
+    public WaterConsumptionResponse findByDate(Long date) {
+        final Water water = waterRepository.findByDate(date).orElseThrow(() -> new IllegalArgumentException("Invalid water date"));
         return mapAllWaterConsumptionsToWaterConsumptionResponse(water.getId());
     }
 
     @Override
     public WaterConsumptionResponse deleteWaterConsumption(WaterConsumptionRequest waterConsumptionRequest) {
-        waterConsumptionRepository.deleteById(waterConsumptionRequest.getWaterConsumptionId());
+        final WaterConsumption waterConsumption = waterConsumptionRepository.findByTimeAndWaterId(waterConsumptionRequest.getTime(), waterConsumptionRequest.getWaterId());
+        waterConsumptionRepository.deleteById(waterConsumption.getId());
         return mapAllWaterConsumptionsToWaterConsumptionResponse(waterConsumptionRequest.getWaterId());
     }
 
     @Override
     public WaterConsumptionResponse createWaterConsumption(final WaterConsumptionRequest waterConsumptionRequest) {
         final Water water = waterRepository.findById(waterConsumptionRequest.getWaterId()).orElseThrow(() -> new IllegalArgumentException("Invalid water id"));
-        final WaterConsumption waterConsumption = waterConsumptionRepository.save(new WaterConsumption(waterConsumptionRequest.getTime(),
-                waterConsumptionRequest.getConsumption(), water));
+        WaterConsumption waterConsumption = null;
+        if (checkIsUnique(waterConsumptionRequest.getTime(), waterConsumptionRequest.getWaterId()) == null) {
+            waterConsumption = new WaterConsumption(waterConsumptionRequest.getTime(),
+                    waterConsumptionRequest.getConsumption(), water);
+        } else {
+            waterConsumption = checkIsUnique(waterConsumptionRequest.getTime(), waterConsumptionRequest.getWaterId());
+            waterConsumption.setConsumption(waterConsumptionRequest.getConsumption());
+            waterConsumption.setWater(water);
+        }
+        waterConsumptionRepository.save(waterConsumption);
         return mapAllWaterConsumptionsToWaterConsumptionResponse(waterConsumptionRequest.getWaterId());
     }
 
     @Override
     public WaterConsumptionResponse updateWaterConsumption(final WaterConsumptionRequest waterConsumptionRequest) {
-        final WaterConsumption waterConsumption = waterConsumptionRepository.findById(waterConsumptionRequest.getWaterConsumptionId()).orElseThrow(() -> new IllegalArgumentException("Invalid waterConsumption id"));
-        waterConsumption.setTime(waterConsumptionRequest.getTime());
+        final WaterConsumption waterConsumption = waterConsumptionRepository.findByTimeAndWaterId(waterConsumptionRequest.getTime(), waterConsumptionRequest.getWaterId());
         waterConsumption.setConsumption(waterConsumptionRequest.getConsumption());
         waterConsumptionRepository.save(waterConsumption);
         return mapAllWaterConsumptionsToWaterConsumptionResponse(waterConsumptionRequest.getWaterId());
     }
 
     private WaterConsumptionResponse mapAllWaterConsumptionsToWaterConsumptionResponse(final long id) {
-        final Water water = waterRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid water id"));
         final List<WaterConsumption> waterConsumptions = waterConsumptionRepository.findAllByWaterId(id);
-        waterConsumptions.forEach(waterConsum -> waterConsum.setWater(water));
-        return new WaterConsumptionResponse(id, water.getMinConsumption(), waterConsumptions);
+        final List<ConsumptionResponse> consumptionResponses = new ArrayList<>();
+        waterConsumptions.forEach(waterConsum -> {
+            consumptionResponses.add(new ConsumptionResponse(waterConsum.getTime(), waterConsum.getConsumption()));
+        });
+        return new WaterConsumptionResponse(id, consumptionResponses);
+    }
+
+    private WaterConsumption checkIsUnique(String time, long waterId) {
+        WaterConsumption waterConsumptions = waterConsumptionRepository.findByTimeAndWaterId(time, waterId);
+        if (waterConsumptions == null) {
+            return null;
+        }
+        return waterConsumptions;
     }
 }

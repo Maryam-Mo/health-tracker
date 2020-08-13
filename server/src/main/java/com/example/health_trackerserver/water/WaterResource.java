@@ -38,7 +38,7 @@ public class WaterResource {
     }
 
     @GetMapping("/findAllConsumptionsByDate/{date}")
-    public WaterConsumptionResponse findByDate(@PathVariable String date) {
+    public WaterConsumptionResponse findByDate(@PathVariable Long date) {
         return waterService.findByDate(date);
     }
 

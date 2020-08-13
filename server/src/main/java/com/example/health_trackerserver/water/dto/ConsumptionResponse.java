@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class WaterConsumptionRequest {
-    private long waterId;
+public class ConsumptionResponse {
     private String time;
     private double consumption;
 }

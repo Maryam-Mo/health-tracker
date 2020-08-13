@@ -6,6 +6,7 @@ import com.example.health_trackerserver.water.dto.WaterConsumptionRequest;
 import com.example.health_trackerserver.water.dto.WaterConsumptionResponse;
 import com.example.health_trackerserver.water.dto.WaterRequest;
 import com.example.health_trackerserver.water.dto.WaterResponse;
+import com.example.health_trackerserver.water.entity.WaterConsumption;
 import ma.glasnost.orika.MapperFacade;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,45 +50,39 @@ public class WaterServiceTest extends HealthTrackerServerApplicationTests {
         final WaterConsumptionResponse waterConsumptionResponse = waterService.createWaterConsumption(getWaterConsumption());
 
         assertNotNull(waterConsumptionResponse);
-        assertEquals(2, waterConsumptionResponse.getMinConsumption(), 0);
-        assertEquals(waterConsumptionResponse.getWaterConsumptions().size(), 1);
-        assertEquals(getWaterConsumption().getTime(), waterConsumptionResponse.getWaterConsumptions().get(0).getTime());
+        assertEquals(1, waterConsumptionResponse.getWaterConsumptions().size());
         assertEquals(getWaterConsumption().getConsumption(), waterConsumptionResponse.getWaterConsumptions().get(0).getConsumption(), 0);
+        assertEquals(getWaterConsumption().getTime(), waterConsumptionResponse.getWaterConsumptions().get(0).getTime());
     }
 
     @Test
     public void updateWaterConsumption() {
         final WaterConsumptionResponse createdWaterConsumptionResponse = waterService.createWaterConsumption(getWaterConsumption());
-        final WaterConsumptionRequest waterConsumptionRequest = new WaterConsumptionRequest(createdWaterConsumptionResponse.getWaterConsumptions().get(0).getId(), createdWaterConsumptionResponse.getWaterId(), "8 Am", 0.6);
+        final WaterConsumptionRequest waterConsumptionRequest = new WaterConsumptionRequest(createdWaterConsumptionResponse.getWaterId(), getWaterConsumption().getTime(), 0.6);
         final WaterConsumptionResponse updatedWaterConsumptionResponse = waterService.updateWaterConsumption(waterConsumptionRequest);
 
         assertNotNull(updatedWaterConsumptionResponse);
-        assertEquals(2, updatedWaterConsumptionResponse.getMinConsumption(), 0);
         assertEquals(waterConsumptionRequest.getWaterId(), updatedWaterConsumptionResponse.getWaterId(), 0);
         assertEquals(1, updatedWaterConsumptionResponse.getWaterConsumptions().size());
-        assertEquals(waterConsumptionRequest.getTime(), updatedWaterConsumptionResponse.getWaterConsumptions().get(0).getTime());
-        assertEquals(waterConsumptionRequest.getConsumption(), updatedWaterConsumptionResponse.getWaterConsumptions().get(0).getConsumption(), 0);
     }
 
     @Test
     public void findByDate() {
         waterService.createWaterConsumption(getWaterConsumption());
         String date = "2019-12-12";
-        WaterConsumptionResponse waterConsumptionResponse = waterService.findByDate(date);
+        WaterConsumptionResponse waterConsumptionResponse = waterService.findByDate(DateUtil.INSTANCE.convertToMillis(date));
 
         assertNotNull(waterConsumptionResponse);
-        assertEquals(2, waterConsumptionResponse.getMinConsumption(), 0);
         assertEquals(waterConsumptionResponse.getWaterConsumptions().size(), 1);
     }
 
     @Test
     public void deleteWaterConsumption() {
         final WaterConsumptionResponse createdWaterConsumptionResponse = waterService.createWaterConsumption(getWaterConsumption());
-        final WaterConsumptionRequest waterConsumptionRequest = new WaterConsumptionRequest(createdWaterConsumptionResponse.getWaterConsumptions().get(0).getId(), createdWaterConsumptionResponse.getWaterId());
+        final WaterConsumptionRequest waterConsumptionRequest = new WaterConsumptionRequest(createdWaterConsumptionResponse.getWaterId(), getWaterConsumption().getTime(), getWaterConsumption().getConsumption());
         final WaterConsumptionResponse waterConsumptionResponse = waterService.deleteWaterConsumption(waterConsumptionRequest);
 
         assertNotNull(waterConsumptionResponse);
-        assertEquals(2, waterConsumptionResponse.getMinConsumption(), 0);
         assertEquals(waterConsumptionResponse.getWaterConsumptions().size(), 0);
     }
 

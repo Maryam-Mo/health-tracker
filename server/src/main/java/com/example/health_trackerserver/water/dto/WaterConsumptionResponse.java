@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,5 @@ import java.util.Map;
 @NoArgsConstructor
 public class WaterConsumptionResponse {
     private long waterId;
-    private double minConsumption;
-    private List<WaterConsumption> waterConsumptions;
+    private List<ConsumptionResponse> waterConsumptions;
 }

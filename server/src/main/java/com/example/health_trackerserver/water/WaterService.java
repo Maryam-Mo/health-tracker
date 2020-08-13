@@ -12,7 +12,7 @@ import com.example.health_trackerserver.water.entity.Water;
 public interface WaterService {
     WaterResponse create(WaterRequest waterRequest);
     WaterResponse update(WaterRequest waterRequest);
-    WaterConsumptionResponse findByDate(String date);
+    WaterConsumptionResponse findByDate(Long date);
     WaterConsumptionResponse deleteWaterConsumption(WaterConsumptionRequest waterConsumptionRequest);
     WaterConsumptionResponse createWaterConsumption(WaterConsumptionRequest waterConsumptionRequest);
     WaterConsumptionResponse updateWaterConsumption(WaterConsumptionRequest waterConsumptionRequest);

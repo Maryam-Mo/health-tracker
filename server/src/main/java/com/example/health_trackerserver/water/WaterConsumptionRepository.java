@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface WaterConsumptionRepository extends JpaRepository<WaterConsumption, Long> {
     List<WaterConsumption> findAllByWaterId(long id);
+    WaterConsumption findByTimeAndWaterId(String time, long waterId);
 }
