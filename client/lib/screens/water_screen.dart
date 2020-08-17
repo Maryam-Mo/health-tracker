@@ -5,12 +5,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:health/components/date_picker.dart';
 import 'package:health/components/icon_button.dart';
 import 'package:health/components/input_formatter.dart';
-import 'package:health/components/purple_container.dart';
+import 'package:health/components/small_purple_container.dart';
 import 'package:health/components/time_picker.dart';
 import 'package:health/constants.dart';
 import 'package:health/models/water_consumption_request.dart';
 import 'package:health/models/water_consumption_response.dart';
 import 'package:health/models/water_response.dart';
+import 'package:health/screens/setting_screen.dart';
 import 'package:health/services/water_consumption_service.dart';
 import 'package:health/services/water_service.dart';
 
@@ -66,69 +67,10 @@ class _WaterScreenState extends State<WaterScreen> {
           SizedBox(
             height: 80,
           ),
-          Padding(
-            padding: EdgeInsets.only(left: 10),
-            child: Stack(
-              alignment: Alignment.topLeft,
-              children: <Widget>[
-                Container(
-                  width: 330,
-                  height: 190,
-                  color: kBackgroundColor,
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: PurpleContainerWithShadows(
-                    width: 320,
-                    height: 180,
-                    begin: Alignment.centerRight,
-                    end: Alignment.centerLeft,
-                    column: Column(
-                      children: <Widget>[
-                        SizedBox(
-                          height: 110,
-                        ),
-                        Text(
-                          'Water Consumption',
-                          style: kTitleTextStyle,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(100),
-                    ),
-                    border: Border.all(
-                      width: 0.3,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 85,
-                  height: 85,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(100),
-                    ),
-                    color: kBackgroundColor,
-                  ),
-                  child: Image(
-                    color: Color(0xFFF29C9F),
-                    image: AssetImage(
-                      'images/Water_drop.png',
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          SmallPurpleContainer(
+            text: 'Water Consumption',
+            imageUrl: 'images/Water_drop.png',
+            padding: 10,
           ),
           DatePickerRow(),
           Expanded(
@@ -205,6 +147,18 @@ class _WaterScreenState extends State<WaterScreen> {
                     icon: Image(
                       image: AssetImage(
                         'images/Home.png',
+                      ),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  WhiteIconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, SettingScreen.id);
+                    },
+                    text: '',
+                    icon: Image(
+                      image: AssetImage(
+                        'images/Wrench.png',
                       ),
                       fit: BoxFit.cover,
                     ),
