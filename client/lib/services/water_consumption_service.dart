@@ -6,7 +6,7 @@ class WaterConsumptionService {
   WaterConsumptionService({this.url});
 
   final String url;
-  final String baseUrl = 'http://192.168.2.100:8080';
+  final String baseUrl = 'http://192.168.2.101:8080';
 
   Future<WaterConsumptionResponse> postData(
       WaterConsumptionRequest waterConsumptionRequest) async {

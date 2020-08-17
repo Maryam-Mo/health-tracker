@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:health/components/date_picker.dart';
 import 'package:health/components/icon_button.dart';
 import 'package:health/components/input_formatter.dart';
@@ -30,7 +31,6 @@ class _WaterScreenState extends State<WaterScreen> {
   void initState() {
     super.initState();
     createWater(dateTime);
-    getWaterConsumptions(dateTime);
   }
 
   void createWater(dateTime) async {
@@ -39,21 +39,22 @@ class _WaterScreenState extends State<WaterScreen> {
     WaterService waterService = WaterService(url: '/api/water/create');
     waterResponse = await waterService
         .postData(WaterResponse(id: 1, date: date, minConsumption: 2));
+    getWaterConsumptions(dateTime);
   }
 
-  void getWaterConsumptions(dateTime) async {
+  Future<List<WaterConsumption>> getWaterConsumptions(dateTime) async {
     int date = new DateTime(dateTime.year, dateTime.month, dateTime.day)
         .millisecondsSinceEpoch;
     WaterConsumptionService waterConsumptionService = WaterConsumptionService(
         url: '/api/water/findAllConsumptionsByDate/${date}');
     waterConsumptionResponse = await waterConsumptionService.fetchData();
-    print(waterConsumptionResponse.waterConsumptions);
+    _waterConsumption = [];
     if (waterConsumptionResponse != null) {
       setState(() {
-        _waterConsumption = [];
         _waterConsumption.addAll(waterConsumptionResponse.waterConsumptions);
       });
     }
+    return _waterConsumption;
   }
 
   @override
@@ -135,20 +136,42 @@ class _WaterScreenState extends State<WaterScreen> {
             child: ListView.builder(
                 itemCount: _waterConsumption.length,
                 itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 80),
-                    child: Row(
-                      children: <Widget>[
-                        Text(
-                          _waterConsumption[index].time + ' consumed ',
-                          style: kListViewTextStyle,
-                        ),
-                        Text(
-                          _waterConsumption[index].consumption.toString() +
-                              ' Liter',
-                          style: kListViewTextStyle,
-                        ),
-                      ],
+                  final item = _waterConsumption[index];
+                  return Dismissible(
+                    key: Key(item.time),
+                    onDismissed: (direction) async {
+                      await deleteWaterConsumption(item.time, waterResponse.id);
+                      getWaterConsumptions(dateTime);
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text('$item dismissed'),
+                      ));
+                    },
+                    background: Container(color: Colors.red),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 40),
+                      child: Row(
+                        children: <Widget>[
+                          Text(
+                            _waterConsumption[index].time + ' consumed ',
+                            style: kListViewTextStyle,
+                          ),
+                          Text(
+                            _waterConsumption[index].consumption.toString() +
+                                ' Liter',
+                            style: kListViewTextStyle,
+                          ),
+                          SizedBox(
+                            width: 60,
+                          ),
+                          FlatButton.icon(
+                              onPressed: () {},
+                              icon: Icon(
+                                FontAwesomeIcons.trash,
+                                color: kDarkPurpleColor,
+                              ),
+                              label: Text(''))
+                        ],
+                      ),
                     ),
                   );
                 }),
@@ -275,6 +298,17 @@ Future<WaterConsumptionResponse> createWaterConsumption(
     waterConsumption) async {
   WaterConsumptionService waterConsumptionService =
       WaterConsumptionService(url: '/api/water/createWaterConsumption');
+  WaterConsumptionResponse waterConsumptionResponse =
+      await waterConsumptionService.postData(waterConsumption);
+  print(waterConsumptionResponse.waterConsumptions);
+  return waterConsumptionResponse;
+}
+
+Future<WaterConsumptionResponse> deleteWaterConsumption(time, waterId) async {
+  WaterConsumptionRequest waterConsumption = new WaterConsumptionRequest(
+      waterId: waterId, time: time, consumption: 0.0);
+  WaterConsumptionService waterConsumptionService =
+      WaterConsumptionService(url: '/api/water/deleteWaterConsumption');
   WaterConsumptionResponse waterConsumptionResponse =
       await waterConsumptionService.postData(waterConsumption);
   print(waterConsumptionResponse.waterConsumptions);

@@ -17,6 +17,7 @@ dependencies:
   intl: ^0.16.1
   http: ^0.12.2
   flutter_cupertino_date_picker: ^1.0.26+2
+  font_awesome_flutter: ^8.8.1
 
 dev_dependencies:
   flutter_test:
