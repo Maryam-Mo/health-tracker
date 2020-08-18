@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:health/components/date_picker.dart';
 import 'package:health/components/icon_button.dart';
 import 'package:health/components/input_formatter.dart';
+import 'package:health/components/purple_raised_button.dart';
 import 'package:health/components/small_purple_container.dart';
 import 'package:health/components/time_picker.dart';
 import 'package:health/constants.dart';
@@ -31,7 +33,9 @@ class _WaterScreenState extends State<WaterScreen> {
   @override
   void initState() {
     super.initState();
-    createWater(dateTime);
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      createWater(dateTime);
+    });
   }
 
   void createWater(dateTime) async {
@@ -43,7 +47,7 @@ class _WaterScreenState extends State<WaterScreen> {
     getWaterConsumptions(dateTime);
   }
 
-  Future<List<WaterConsumption>> getWaterConsumptions(dateTime) async {
+  void getWaterConsumptions(dateTime) async {
     int date = new DateTime(dateTime.year, dateTime.month, dateTime.day)
         .millisecondsSinceEpoch;
     WaterConsumptionService waterConsumptionService = WaterConsumptionService(
@@ -55,7 +59,6 @@ class _WaterScreenState extends State<WaterScreen> {
         _waterConsumption.addAll(waterConsumptionResponse.waterConsumptions);
       });
     }
-    return _waterConsumption;
   }
 
   @override
@@ -219,27 +222,18 @@ void _settingModalBottomSheet(context, dateTime, waterResponse) {
                 height: 100,
               ),
               Center(
-                child: ButtonTheme(
-                  height: 40,
-                  child: RaisedButton(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0)),
-                    elevation: 20,
-                    color: kLightPurpleColor,
-                    onPressed: () async {
-                      WaterConsumptionRequest waterConsumption =
-                          new WaterConsumptionRequest(
-                              waterId: waterResponse.id,
-                              time: TimePickerRow().createState().formattedTime,
-                              consumption: double.parse(myController.text));
-                      await createWaterConsumption(waterConsumption);
-                      WaterScreen()
-                          .createState()
-                          .getWaterConsumptions(dateTime);
-                      Navigator.pushNamed(context, WaterScreen.id);
-                    },
-                    child: Text('Submit'),
-                  ),
+                child: PurpleRaisedButton(
+                  name: 'Submit',
+                  onPressed: () async {
+                    WaterConsumptionRequest waterConsumption =
+                        new WaterConsumptionRequest(
+                            waterId: waterResponse.id,
+                            time:
+                                TimePickerRow().createState().formattedDateTime,
+                            consumption: double.parse(myController.text));
+                    await createWaterConsumption(waterConsumption);
+                    Navigator.pushNamed(context, WaterScreen.id);
+                  },
                 ),
               ),
             ],
@@ -254,7 +248,6 @@ Future<WaterConsumptionResponse> createWaterConsumption(
       WaterConsumptionService(url: '/api/water/createWaterConsumption');
   WaterConsumptionResponse waterConsumptionResponse =
       await waterConsumptionService.postData(waterConsumption);
-  print(waterConsumptionResponse.waterConsumptions);
   return waterConsumptionResponse;
 }
 
@@ -265,6 +258,5 @@ Future<WaterConsumptionResponse> deleteWaterConsumption(time, waterId) async {
       WaterConsumptionService(url: '/api/water/deleteWaterConsumption');
   WaterConsumptionResponse waterConsumptionResponse =
       await waterConsumptionService.postData(waterConsumption);
-  print(waterConsumptionResponse.waterConsumptions);
   return waterConsumptionResponse;
 }

@@ -1,24 +1,31 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:health/constants.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class TimePickerRow extends StatefulWidget {
-  static DateTime dateTime = DateTime.now();
-
   @override
   _TimePickerRowState createState() => _TimePickerRowState();
 }
 
 class _TimePickerRowState extends State<TimePickerRow> {
-  String formattedTime = DateFormat('jm').format(TimePickerRow.dateTime);
+  String formattedDateTime = _formatDateTime(DateTime.now());
+
+  @override
+  void initState() {
+    formattedDateTime = _formatDateTime(DateTime.now());
+    Timer.periodic(Duration(minutes: 1), (Timer t) => _getTime());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text(formattedTime),
+        Text(formattedDateTime),
         FlatButton(
             onPressed: () {
               DatePicker.showTime12hPicker(context,
@@ -33,9 +40,7 @@ class _TimePickerRowState extends State<TimePickerRow> {
                       doneStyle: TextStyle(color: Colors.white, fontSize: 16)),
                   onConfirm: (date) {
                 setState(() {
-                  TimePickerRow.dateTime = date;
-                  formattedTime =
-                      DateFormat('jm').format(TimePickerRow.dateTime);
+                  formattedDateTime = _formatDateTime(date);
                 });
               }, currentTime: DateTime.now(), locale: LocaleType.en);
             },
@@ -45,5 +50,17 @@ class _TimePickerRowState extends State<TimePickerRow> {
             )),
       ],
     );
+  }
+
+  void _getTime() {
+    final DateTime now = DateTime.now();
+    final String formattedTime = _formatDateTime(now);
+    setState(() {
+      formattedDateTime = formattedTime;
+    });
+  }
+
+  static String _formatDateTime(DateTime dateTime) {
+    return DateFormat('jm').format(dateTime);
   }
 }
